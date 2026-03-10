@@ -1,0 +1,492 @@
+<script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <!-- ANNOUNCEMENT STRIP -->
+    <div id="announcementStrip">
+        <div class="strip-accent-line"></div>
+        <div class="strip-single" id="stripSingle" style="display:none">
+            <div class="strip-single-icon" id="stripSingleIcon">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" id="stripSingleIconSvg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="strip-single-label" id="stripSingleLabel">עדכון</span>
+            <div class="strip-single-sep"></div>
+            <span class="strip-single-text" id="stripSingleText"></span>
+            <span class="strip-single-date" id="stripSingleDate"></span>
+            <button class="strip-single-cta" onclick="openPanel()">
+                לפרטים
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+        </div>
+        <div class="strip-inner" id="stripMulti" style="display:none">
+            <div class="strip-label-pill">
+                <div class="strip-type-dot"></div>
+                <span class="strip-type-text" id="stripTypeText">עדכון</span>
+                <span class="strip-count-badge" id="stripCountBadge">1</span>
+            </div>
+            <div class="strip-fade-wrap" id="stripFadeWrap"></div>
+            <div class="strip-dots" id="stripDots"></div>
+            <button class="strip-cta" onclick="openPanel()">
+                <span class="strip-cta-text">כל העדכונים</span>
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- NAV -->
+    <nav class="glass sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-br from-blue-600 to-blue-700 text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                </div>
+                <div class="leading-none select-none">
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">CHEETAH<span class="text-blue-600">JOBS</span></h1>
+                    <span class="text-[10px] font-bold text-slate-400 tracking-widest uppercase ml-0.5">מערכת שיבוץ</span>
+                </div>
+            </div>
+            <div class="hidden sm:flex items-center gap-2 bg-white px-4 py-1.5 rounded-full border border-slate-200 shadow-sm">
+                <span class="relative flex h-2.5 w-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
+                <span class="text-xs font-bold text-slate-700">מערכת פעילה</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div class="text-center mb-10">
+            <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-3 tracking-tight">לוח <span id="jobTypeTitle" class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">משמרות</span></h2>
+            <p class="text-slate-500 font-medium text-lg max-w-2xl mx-auto" id="jobTypeSubtitle">מצאו את המשמרת הבאה שלכם, הירשמו בקליק והתחילו לעבוד.</p>
+        </div>
+        <div class="max-w-md mx-auto mb-8">
+            <div class="toggle-switch">
+                <div class="toggle-option active" id="tempToggle" onclick="switchJobType('temporary')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    משמרות מזדמנות
+                </div>
+                <div class="toggle-option" id="permToggle" onclick="switchJobType('permanent')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    משרות קבועות
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-soft border border-slate-100 p-4 mb-10 transition-all duration-300">
+            <div class="flex gap-3 items-center mb-0 md:mb-4">
+                <div class="relative flex-grow z-10">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></div>
+                    <input type="text" id="searchInput" onkeyup="applyFilters()" autocomplete="off" class="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-medium" placeholder="חפש...">
+                    <div class="fuzzy-suggestion" id="fuzzySuggestion">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#6366f1" stroke-width="2" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        <span class="fuzzy-suggestion-text" id="fuzzySuggestionText"></span>
+                        <button class="fuzzy-suggestion-accept" id="fuzzySuggestionAccept">חפש</button>
+                        <button class="fuzzy-suggestion-dismiss" onclick="document.getElementById('fuzzySuggestion').classList.remove('visible')">✕</button>
+                    </div>
+                </div>
+                <button onclick="toggleFilters()" class="md:hidden shrink-0 bg-blue-50 text-blue-600 border border-blue-100 p-3 rounded-xl active:scale-95 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                </button>
+            </div>
+            <div id="advancedFilters" class="hidden md:grid md:grid-cols-3 gap-4 border-t md:border-t-0 border-slate-100 pt-4 md:pt-0 mt-4 md:mt-0">
+                <div class="relative">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg></div>
+                    <input type="text" id="locationFilter" onkeyup="applyFilters()" class="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="סינון לפי מיקום">
+                </div>
+                <div class="relative">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                    <input type="number" id="rateFilter" onkeyup="applyFilters()" class="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="שכר מינימום לשעה">
+                </div>
+                <div class="relative">
+                    <select id="ageFilter" onchange="applyFilters()" class="w-full pl-4 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm appearance-none cursor-pointer text-slate-500">
+                        <option value="">הצג הכל (ללא הגבלת גיל)</option>
+                        <option value="16">אני בן 16+</option>
+                        <option value="17">אני בן 17+</option>
+                        <option value="18">אני בן 18+</option>
+                        <option value="21">אני בן 21+</option>
+                    </select>
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></div>
+                </div>
+            </div>
+            <div class="flex justify-between items-center mt-3 pt-3 border-t border-slate-100">
+                <div class="text-xs font-bold text-slate-400" id="resultsCount">מציג את כל המשמרות</div>
+                <button onclick="clearFilters()" class="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">נקה סינון</button>
+            </div>
+        </div>
+        <div id="shifts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-10"></div>
+    </main>
+
+    <footer class="mt-auto bg-white border-t border-slate-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="text-center md:text-right">
+                    <p class="text-slate-900 font-bold text-lg tracking-tight">Cheetah Jobs</p>
+                    <p class="text-slate-500 text-sm mt-1">&copy; 2026 Cheetah Jobs System. כל הזכויות שמורות.</p>
+                </div>
+                <div class="flex items-center gap-6">
+                    <button onclick="openTerms()" class="group flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        תקנון האתר
+                    </button>
+                    <span class="h-4 w-px bg-slate-200"></span>
+                    <button onclick="openContact()" class="group flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        צור קשר
+                    </button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- FLOATING BELL -->
+    <button id="announcementBtn" onclick="openPanel()" aria-label="עדכונים">
+        <div id="announcementBadge"></div>
+        <svg class="bell-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+        </svg>
+        <span class="bell-label">עדכונים</span>
+    </button>
+
+    <div id="panelBackdrop" onclick="closePanel()"></div>
+
+    <!-- ANNOUNCEMENTS PANEL -->
+    <div id="announcementPanel">
+        <div class="panel-handle"></div>
+        <div class="panel-header">
+            <div class="panel-header-left">
+                <div class="panel-header-icon">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+                </div>
+                <div>
+                    <div class="panel-header-title">עדכונים ×<span id="panelCount">0</span></div>
+                    <div class="panel-header-sub">הודעות מהצוות</div>
+                </div>
+            </div>
+            <button class="panel-close" onclick="closePanel()">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="panel-tabs-wrapper" id="panelTabsWrapper">
+            <button class="tabs-arrow arrow-right" onclick="scrollTabs(80)">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <button class="tabs-arrow arrow-left" onclick="scrollTabs(-80)">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <div class="panel-tabs" id="panelTabs">
+                <button class="panel-tab active" data-filter="all" onclick="filterPanel(this,'all')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>הכל</button>
+                <button class="panel-tab" data-filter="urgent" onclick="filterPanel(this,'urgent')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>דחוף</button>
+                <button class="panel-tab" data-filter="info" onclick="filterPanel(this,'info')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>כללי</button>
+                <button class="panel-tab" data-filter="new" onclick="filterPanel(this,'new')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>חדש</button>
+                <button class="panel-tab" data-filter="warning" onclick="filterPanel(this,'warning')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>תחזוקה</button>
+                <button class="panel-tab" data-filter="security" onclick="filterPanel(this,'security')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>ביטחוני</button>
+            </div>
+        </div>
+        <div class="panel-scroll" id="panelList"></div>
+    </div>
+
+    <!-- TERMS MODAL -->
+    <div id="termsModal" class="fixed inset-0 z-[100] hidden" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-md" onclick="closeTerms()"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 sm:p-0">
+                <div class="relative transform overflow-hidden rounded-2xl bg-white text-right shadow-2xl sm:my-8 w-full sm:max-w-3xl animate-modal border border-slate-100">
+                    <div class="bg-white/90 backdrop-blur sticky top-0 z-20 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                        <div><h3 class="text-xl font-black text-slate-800 flex items-center gap-2"><span class="bg-blue-100 text-blue-600 p-1.5 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></span>תקנון ותנאי שימוש</h3><p class="text-xs text-slate-500 mt-1 pr-11">עודכן לאחרונה: פברואר 2026</p></div>
+                        <button onclick="closeTerms()" class="group p-2 rounded-full hover:bg-slate-100 transition-colors focus:outline-none"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400 group-hover:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                    </div>
+                    <div class="px-6 py-8 max-h-[60vh] overflow-y-auto custom-scrollbar space-y-8">
+                        <section class="relative pl-2"><h4 class="flex items-center gap-2 font-bold text-slate-900 mb-2"><span class="text-blue-600">01.</span> מהות האתר</h4><p class="text-slate-600 text-sm leading-relaxed">אתר Cheetah Jobs משמש כפלטפורמה טכנולוגית לתווך וחיבור בין מחפשי עבודה למעסיקים.<span class="block mt-2 font-medium text-slate-800 bg-slate-50 p-2 rounded border border-slate-100">הנהלת האתר משמשת כמתווך בלבד ואינה צד ליחסי העבודה.</span></p></section>
+                        <section><h4 class="flex items-center gap-2 font-bold text-slate-900 mb-2"><span class="text-blue-600">02.</span> יחסי עובד-מעביד</h4><p class="text-slate-600 text-sm leading-relaxed">השימוש באתר אינו יוצר יחסי עובד-מעביד מול האתר. המעסיק בפועל הוא האחראי הבלעדי לתשלום שכר, הנפקת תלוש, ושמירה על זכויות סוציאליות ובטיחות.</p></section>
+                        <section><h4 class="flex items-center gap-2 font-bold text-slate-900 mb-2"><span class="text-blue-600">03.</span> הרשמה והתחייבות</h4><p class="text-slate-600 text-sm leading-relaxed">אי-הגעה למשמרת ("No Show") או ביטול ברגע האחרון ללא סיבה מוצדקת פוגעים באמינותך ועלולים לגרור <strong class="text-rose-500">חסימה לצמיתות</strong> מהפלטפורמה.</p></section>
+                        <section><h4 class="flex items-center gap-2 font-bold text-slate-900 mb-2"><span class="text-blue-600">04.</span> שכר ותשלומים</h4><div class="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl p-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg><p class="text-xs text-amber-800 font-medium leading-relaxed">התשלום מתבצע ע"י המעסיק בפועל ב-10 לחודש העוקב.</p></div></section>
+                        <section><h4 class="flex items-center gap-2 font-bold text-slate-900 mb-2"><span class="text-blue-600">05.</span> פרטיות ומידע</h4><p class="text-slate-600 text-sm leading-relaxed">אישורך מהווה הסכמה להעברת פרטייך (שם, ת"ז, טלפון) למעסיק הרלוונטי לצורך שיבוץ והפקת שכר.</p></section>
+                    </div>
+                    <div class="p-4 sm:px-6 bg-slate-50 border-t border-slate-100"><button onclick="closeTerms()" class="w-full py-3.5 px-4 bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 text-white font-bold rounded-xl shadow-lg shadow-slate-200 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"><span>קראתי ואני מאשר/ת</span><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTACT MODAL -->
+    <div id="contactModal" class="fixed inset-0 z-[100] hidden" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-md" onclick="closeContact()"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div class="relative w-full max-w-xl bg-white rounded-[26px] shadow-2xl border border-slate-100 overflow-hidden animate-contact-modal">
+                    <div class="bg-gradient-to-l from-blue-600 to-indigo-700 px-6 pt-6 pb-16 relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-10 pointer-events-none"><div class="absolute -top-8 -left-8 w-40 h-40 rounded-full bg-white"></div><div class="absolute -bottom-12 -right-6 w-56 h-56 rounded-full bg-white"></div></div>
+                        <div class="flex justify-between items-start relative z-10"><div><h3 class="text-2xl font-black text-white">צור קשר</h3><p class="text-blue-100 text-sm font-medium mt-1">נשמח לשמוע ממך ולעזור</p></div><button onclick="closeContact()" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/15 border border-white/25 text-white hover:bg-white/25 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button></div>
+                        <a href="/cdn-cgi/l/email-protection#4a202528392925222f247b0a2d272b232664292527" class="relative z-10 mt-5 inline-flex items-center gap-2.5 bg-white/15 border border-white/25 rounded-xl px-4 py-2.5 text-white text-sm font-bold hover:bg-white/25 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><span class="__cf_email__" data-cfemail="b8d2d7dacbdbd7d0ddd689f8dfd5d9d1d496dbd7d5">[email&#160;protected]</span></a>
+                    </div>
+                    <div class="relative -mt-8 mx-4 mb-4 bg-white rounded-2xl border border-slate-100 shadow-lg p-5">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">או שלח/י לנו הודעה ישירה</p>
+                        <form id="contactForm" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-2">נושא הפנייה <span class="text-rose-400">*</span></label>
+                                <div class="flex flex-wrap gap-2" id="subjectChips">
+                                    <div class="contact-subject-chip" data-value="שאלה על משמרת" onclick="selectSubject(this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>שאלה על משמרת</div>
+                                    <div class="contact-subject-chip" data-value="בעיה בהרשמה" onclick="selectSubject(this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>בעיה בהרשמה</div>
+                                    <div class="contact-subject-chip" data-value="שכר ותשלומים" onclick="selectSubject(this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>שכר ותשלומים</div>
+                                    <div class="contact-subject-chip" data-value="ביטול משמרת" onclick="selectSubject(this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>ביטול משמרת</div>
+                                    <div class="contact-subject-chip" data-value="הצעת שיתוף פעולה" onclick="selectSubject(this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>הצעת שיתוף פעולה</div>
+                                    <div class="contact-subject-chip" data-value="אחר" onclick="selectSubject(this)"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"/></svg>אחר</div>
+                                </div>
+                                <input type="hidden" id="contactSubjectInput" name="subject">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="block text-xs font-bold text-slate-500 mb-1.5">שם מלא <span class="text-rose-400">*</span></label><input type="text" name="full_name" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="ישראל ישראלי"></div>
+                                <div><label class="block text-xs font-bold text-slate-500 mb-1.5">טלפון</label><input type="tel" name="phone" maxlength="10" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="050-0000000"></div>
+                            </div>
+                            <div><label class="block text-xs font-bold text-slate-500 mb-1.5">אימייל <span class="text-rose-400">*</span></label><input type="email" name="email" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="your@email.com"></div>
+                            <div><label class="block text-xs font-bold text-slate-500 mb-1.5">הודעה <span class="text-rose-400">*</span></label><textarea name="message" required rows="4" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none transition-all placeholder-slate-400 resize-none" placeholder="כתוב/י את פנייתך כאן..."></textarea></div>
+                            <button type="submit" id="contactSubmitBtn" class="w-full py-3.5 bg-gradient-to-l from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold rounded-xl shadow-lg shadow-blue-200 transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>שלח הודעה</button>
+                            <p class="text-center text-[11px] text-slate-400">נחזור אליך בהקדם האפשרי</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JOB DETAILS MODAL -->
+    <div id="jobDetailsModal" class="jdm-backdrop" onclick="if(event.target===this)closeJobModal()">
+        <div class="jdm-container">
+            <div class="jdm-left-panel" id="jdm-left-panel">
+                <div class="jdm-left-panel-hero">
+                    <img id="jdm-left-img" src="" alt="">
+                    <div class="jdm-left-panel-overlay"></div>
+                </div>
+                <div class="jdm-left-panel-info">
+                    <div class="jdm-left-panel-type" id="jdm-left-type"></div>
+                    <div class="jdm-left-panel-title" id="jdm-left-title"></div>
+                    <div class="jdm-left-panel-company" id="jdm-left-company"></div>
+                    <div class="jdm-left-panel-salary" id="jdm-left-salary"></div>
+                    <div class="jdm-left-panel-location" id="jdm-left-location"></div>
+                    <div class="jdm-left-panel-chips" id="jdm-left-chips"></div>
+                </div>
+            </div>
+            <div class="jdm-right-panel">
+                <div class="jdm-handle"></div>
+                <div class="jdm-header">
+                    <div class="jdm-header-left">
+                        <button class="jdm-back" onclick="closeJobModal()" title="חזור">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                        <span class="jdm-header-label">פרטי המשרה</span>
+                    </div>
+                    <div class="jdm-header-actions">
+                        <button class="jdm-expand" onclick="toggleJobModalFullscreen()" title="מסך מלא">
+                            <svg id="jdmExpandIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                            </svg>
+                        </button>
+                        <button class="jdm-close" onclick="closeJobModal()">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="jdm-scroll" id="jdm-scroll">
+                    <div id="jdm-content"></div>
+                </div>
+                <div class="jdm-cta" id="jdm-cta-fixed" style="display:none">
+                    <button class="jdm-apply-btn" id="jdm-cta-btn">הגש מועמדות <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:1.1rem;height:1.1rem;flex-shrink:0;display:inline"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg></button>
+                    <p class="jdm-apply-note">תקבל מענה תוך 3-5 ימי עסקים</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEMPORARY SHIFT MODAL -->
+    <div id="modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-[28px] shadow-2xl flex flex-col max-h-[95vh] overflow-hidden relative">
+            <div class="bg-white p-6 pb-2 relative z-10">
+                <div class="flex justify-between items-start mb-6"><div><h3 class="text-2xl font-black text-slate-800">אישור שיבוץ</h3><p class="text-slate-500 text-xs font-bold tracking-wide mt-1">טופס הזמנה #<span id="random-order-id">2930</span></p></div><button onclick="closeModal()" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-50 border border-slate-200 text-slate-400 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-200 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button></div>
+                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-center gap-4"><div class="bg-white p-2.5 rounded-xl text-blue-600 shrink-0 shadow-sm border border-blue-50"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div><div><div class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-0.5">פרטי המשמרת הנבחרת</div><div id="modal-shift-info" class="font-bold text-slate-800 text-sm leading-tight"></div></div></div>
+            </div>
+            <div class="overflow-y-auto p-6 pt-2 scrollbar-hide bg-white flex-1">
+                <form id="regForm" class="space-y-4">
+                    <input type="hidden" name="shift_details" id="shift_details">
+                    <input type="hidden" name="shift_hours" id="shift_hours_input">
+                    <input type="hidden" name="shift_date" id="shift_date_input">
+                    <input type="hidden" name="company" id="company_input">
+                    <div class="grid grid-cols-2 gap-4"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">שם פרטי</label><input type="text" name="fname" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="צ׳יטה"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">שם משפחה</label><input type="text" name="lname" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="ג׳ובס"></div></div>
+                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5">תעודת זהות</label><input type="tel" id="idInput" name="id_num" maxlength="9" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="000000000"></div>
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3 flex gap-3 items-center"><div class="bg-emerald-100 p-1.5 rounded-full text-emerald-600 shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div><span class="text-xs font-bold text-emerald-800 leading-tight">השכר משולם ב-10 לכל חודש כנגד תלוש שכר כחוק</span></div>
+                    <div class="grid grid-cols-2 gap-4"><div><label class="block text-xs font-bold text-slate-500 mb-1.5">טלפון נייד</label><input type="tel" id="phoneInput" name="phone" required maxlength="10" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="050-0000000"></div><div><label class="block text-xs font-bold text-slate-500 mb-1.5">תאריך לידה</label><input type="date" name="dob" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none transition-all text-slate-500"></div></div>
+                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5">עיר מגורים</label><input type="text" name="area" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="למשל: תל אביב"></div>
+                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5">כתובת אימייל</label><input type="email" name="email" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="your@email.com"></div>
+                    <div class="pt-4 pb-2"><button type="submit" id="subBtn" class="w-full btn-gradient py-4 rounded-xl font-bold text-lg shadow-xl shadow-blue-500/20 flex items-center justify-center gap-2 transform active:scale-[0.98] transition-all">אשר הרשמה<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></button><p class="text-center text-[11px] text-slate-400 mt-3">בלחיצה על "אשר הרשמה" הנך מסכים לתנאי השימוש</p></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- PERMANENT JOB MODAL -->
+    <div id="permanentModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-[28px] shadow-2xl flex flex-col max-h-[95vh] overflow-hidden relative">
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 pb-4 relative z-10">
+                <div class="flex justify-between items-start mb-4">
+                    <div><h3 class="text-2xl font-black text-white">הגשת מועמדות</h3><p class="text-indigo-100 text-xs font-bold tracking-wide mt-1">טופס #<span id="random-perm-order-id">4820</span></p></div>
+                    <button onclick="closePermanentModal()" class="w-9 h-9 flex items-center justify-center rounded-full bg-white/20 border border-white/30 text-white hover:bg-white/30 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                </div>
+                <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4">
+                    <div class="text-[10px] font-bold text-indigo-200 uppercase tracking-wider mb-1">המשרה שנבחרה</div>
+                    <div id="perm-modal-job-info" class="font-bold text-white text-base leading-tight"></div>
+                </div>
+            </div>
+            <div class="overflow-y-auto p-6 pt-4 scrollbar-hide bg-white flex-1 custom-scrollbar">
+                <form id="permRegForm" class="space-y-4">
+                    <input type="hidden" name="job_title" id="perm_job_title">
+                    <input type="hidden" name="company" id="perm_company">
+                    <input type="hidden" name="location" id="perm_location">
+                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5">שם מלא</label><input type="text" name="full_name" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="שם פרטי ושם משפחה"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1.5">מספר טלפון</label><input type="tel" id="permPhoneInput" name="phone" required maxlength="10" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="050-0000000"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1.5">תאריך לידה</label><input type="date" name="dob" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3 outline-none transition-all text-slate-500"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1.5">כתובת אימייל</label><input type="email" name="email" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="your@email.com"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 mb-1.5">מין</label><select name="gender" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3 outline-none transition-all"><option value="">בחר/י</option><option value="male">זכר</option><option value="female">נקבה</option><option value="other">אחר</option></select></div>
+                    </div>
+                    <div><label class="block text-xs font-bold text-slate-500 mb-1.5">עיר מגורים</label><input type="text" name="city" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3 outline-none transition-all placeholder-slate-400" placeholder="למשל: תל אביב"></div>
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex gap-3 items-start"><div class="bg-indigo-100 p-2 rounded-full text-indigo-600 shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div><div class="text-xs text-indigo-800 leading-relaxed"><strong class="font-bold">שים לב:</strong> המועמדות שלך תועבר למעסיק. תקבל מענה תוך 3-5 ימי עסקים.</div></div>
+                    <div class="pt-4 pb-2">
+                        <button type="submit" id="permSubBtn" class="w-full btn-permanent py-4 rounded-xl font-bold text-lg shadow-xl shadow-indigo-500/20 flex items-center justify-content gap-2 transform active:scale-[0.98] transition-all relative z-10">
+                            <span class="relative z-10">שלח מועמדות</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                        </button>
+                        <p class="text-center text-[11px] text-slate-400 mt-3">בלחיצה על "שלח מועמדות" הנך מסכים לתנאי השימוש</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+
+    <!-- ══ SHARE POPUP ══ -->
+    <div class="share-popup-backdrop" id="sharePopup" onclick="if(event.target===this)closeSharePopup()">
+        <div class="share-popup">
+            <div class="share-handle"></div>
+            <div class="share-header">
+                <div class="share-title">שתף משמרת / משרה</div>
+                <button class="share-close" onclick="closeSharePopup()">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="share-job-info">
+                <div class="share-job-info-title" id="shareJobTitle"></div>
+                <div class="share-job-info-sub" id="shareJobSub"></div>
+            </div>
+            <div class="share-btns">
+                <button class="share-btn" id="shareWhatsAppBtn">
+                    <div class="share-btn-icon" style="background:#dcfce7;">
+                        <svg viewBox="0 0 24 24" fill="#16a34a"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    </div>
+                    <div>
+                        <div class="share-btn-label">שתף ב-WhatsApp</div>
+                        <div class="share-btn-sub">שלח ישירות לחבר או לקבוצה</div>
+                    </div>
+                </button>
+                <button class="share-btn" id="shareNativeBtn">
+                    <div class="share-btn-icon" style="background:#eff6ff;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                    </div>
+                    <div>
+                        <div class="share-btn-label">שתף</div>
+                        <div class="share-btn-sub">אפשרויות שיתוף נוספות</div>
+                    </div>
+                </button>
+            </div>
+            <div class="share-divider"><div class="share-divider-line"></div><div class="share-divider-text">או העתק קישור</div><div class="share-divider-line"></div></div>
+            <div class="share-link-row">
+                <input class="share-link-input" id="shareLinkInput" readonly>
+                <button class="share-copy-btn" id="shareCopyBtn" onclick="copyShareLink()">העתק</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ EMPLOYER MODAL ══ -->
+    <div class="employer-modal-backdrop" id="employerModal" onclick="if(event.target===this)closeEmployerModal()">
+        <div class="employer-modal">
+            <div class="employer-modal-hero" style="position:relative;overflow:hidden;">
+                <div style="position:relative;z-index:1;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);color:white;font-size:11px;font-weight:800;padding:4px 12px;border-radius:99px;">
+                            <svg width="10" height="10" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            לוח מעסיקים
+                        </div>
+                        <button onclick="closeEmployerModal()" style="width:30px;height:30px;background:rgba(255,255,255,0.2);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white;">
+                            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <div style="font-size:22px;font-weight:900;color:white;line-height:1.2;margin-bottom:4px;">פרסמו משרות<br>והגיעו לאלפי מועמדים</div>
+                    <div style="font-size:12.5px;color:rgba(255,255,255,0.75);font-weight:600;">מלאו את הפרטים ונחזור אליכם תוך 24 שעות</div>
+                </div>
+            </div>
+            <div class="employer-modal-scroll" id="employerModalScroll">
+                <div class="employer-field">
+                    <label>שם החברה <span>*</span></label>
+                    <input class="employer-input" id="emp_company" placeholder="לדוגמה: חברת ABC בע״מ" type="text">
+                </div>
+                <div class="employer-field">
+                    <label>שם איש הקשר <span>*</span></label>
+                    <input class="employer-input" id="emp_contact" placeholder="שם פרטי ומשפחה" type="text">
+                </div>
+                <div class="employer-field">
+                    <label>טלפון <span>*</span></label>
+                    <input class="employer-input" id="emp_phone" placeholder="05X-XXXXXXX" type="tel" dir="ltr">
+                </div>
+                <div class="employer-field">
+                    <label>אימייל</label>
+                    <input class="employer-input" id="emp_email" placeholder="company@example.com" type="email" dir="ltr">
+                </div>
+                <div class="employer-field">
+                    <label>גודל החברה</label>
+                    <select class="employer-input employer-select" id="emp_size">
+                        <option value="">בחרו גודל</option>
+                        <option>1-10 עובדים</option>
+                        <option>11-50 עובדים</option>
+                        <option>51-200 עובדים</option>
+                        <option>201-500 עובדים</option>
+                        <option>500+ עובדים</option>
+                    </select>
+                </div>
+                <div class="employer-field">
+                    <label>כמות משרות לפרסום</label>
+                    <select class="employer-input employer-select" id="emp_count">
+                        <option value="">בחרו כמות</option>
+                        <option>1 משרה</option>
+                        <option>2-5 משרות</option>
+                        <option>6-10 משרות</option>
+                        <option>10+ משרות</option>
+                    </select>
+                </div>
+                <div class="employer-field">
+                    <label>תקציב חודשי לפרסום</label>
+                    <div class="employer-chips-row" id="empBudgetChips">
+                        <div class="employer-chip" onclick="selectEmployerChip(this,'budget')">עד ₪500</div>
+                        <div class="employer-chip" onclick="selectEmployerChip(this,'budget')">₪500-₪1,500</div>
+                        <div class="employer-chip" onclick="selectEmployerChip(this,'budget')">₪1,500-₪3,000</div>
+                        <div class="employer-chip" onclick="selectEmployerChip(this,'budget')">₪3,000+</div>
+                    </div>
+                </div>
+                <div class="employer-field">
+                    <label>סוג משרה</label>
+                    <div class="employer-chips-row" id="empTypeChips">
+                        <div class="employer-chip" onclick="selectEmployerChip(this,'type')">משמרות / ארעי</div>
+                        <div class="employer-chip" onclick="selectEmployerChip(this,'type')">משרה קבועה</div>
+                        <div class="employer-chip" onclick="selectEmployerChip(this,'type')">שניהם</div>
+                    </div>
+                </div>
+                <div class="employer-field">
+                    <label>הערות נוספות</label>
+                    <textarea class="employer-input" id="emp_notes" rows="3" placeholder="תיאור קצר, דרישות מיוחדות, או כל מה שחשוב לדעת..." style="resize:none;"></textarea>
+                </div>
+                <button class="employer-submit-btn" onclick="submitEmployerForm()">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                    שלחו פרטים — נחזור בהקדם
+                </button>
+                <div style="text-align:center;font-size:11.5px;color:#94a3b8;font-weight:600;margin-top:10px;padding-bottom:4px;">פנייה ללא עלות ✓ מענה תוך 24 שעות</div>
+            </div>
+        </div>
+    </div>
